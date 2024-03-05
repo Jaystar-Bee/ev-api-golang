@@ -16,8 +16,11 @@ func main() {
 }
 
 func getEvent(context *gin.Context) {
+
+	events := models.GetAllEvents()
 	context.JSON(http.StatusOK, gin.H{
-		"message": "Hello buddy",
+		"message": "Events fetched successfully",
+		"data":    events,
 	})
 }
 
@@ -36,6 +39,7 @@ func createEvent(context *gin.Context) {
 
 	event.ID = 2
 	event.UserId = 10
+	event.Save()
 	context.JSON(http.StatusCreated, gin.H{
 		"message": "Event created successfully",
 		"data":    event,

@@ -1,0 +1,9 @@
+POST http://localhost:8080/events
+Content-Type: application/json
+
+{
+    "name": "Event Test One",
+    "description": "This is a dummy description for this event",
+    "location": "Iwo, Nigeria",
+    "date": "2023-04-10T13:20:54.000Z"
+}

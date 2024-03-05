@@ -3,18 +3,17 @@ package models
 import "time"
 
 type Event struct {
-	ID          int       `json:"id"`
+	ID          int
 	Name        string    `json:"name" binding:"required"`
 	Description string    `json:"description" binding:"required"`
 	Location    string    `json:"location" binding:"required"`
 	DateTime    time.Time `json:"date" binding:"required"`
-	UserId      int       `json:"user_id"`
+	UserId      int
 }
 
 var events = []Event{}
 
 func (e *Event) Save() {
-	// Save an event to the database
 	events = append(events, *e)
 }
 
