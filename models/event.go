@@ -1,22 +1,61 @@
 package models
 
-import "time"
+import (
+	"time"
+
+	"test.com/event-api/db"
+)
 
 type Event struct {
-	ID          int
+	ID          int64     `json:"id"`
 	Name        string    `json:"name" binding:"required"`
 	Description string    `json:"description" binding:"required"`
 	Location    string    `json:"location" binding:"required"`
-	DateTime    time.Time `json:"date" binding:"required"`
-	UserId      int
+	DateTime    time.Time `json:"date_time" binding:"required"`
+	CreatedAt   string    `json:"created_at"`
+	UserId      int64     `json:"user_id"`
 }
 
-var events = []Event{}
+// var events = []Event{}
 
-func (e *Event) Save() {
-	events = append(events, *e)
+func (e *Event) Save() error {
+	create_query := `INSERT INTO events (name, description, location, date_time, created_at, user_id) VALUES (?,?,?,?,?,?)`
+
+	statement, err := db.DB.Prepare(create_query)
+	if err != nil {
+		return err
+	}
+	time := time.Now().Format(time.RFC3339)
+	defer statement.Close()
+	data, err := statement.Exec(e.Name, e.Description, e.Location, e.DateTime, time, e.UserId)
+	if err != nil {
+		return err
+	}
+	id, err := data.LastInsertId()
+	if err != nil {
+		return err
+	}
+	e.ID = id
+	e.CreatedAt = time
+	return nil
 }
 
-func GetAllEvents() []Event {
-	return events
+func GetAllEvents() ([]Event, error) {
+
+	const query = `SELECT * FROM events`
+	rows, err := db.DB.Query(query)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var events []Event
+	for rows.Next() {
+		var event Event
+		err := rows.Scan(&event.ID, &event.Name, &event.Description, &event.Location, &event.DateTime, &event.CreatedAt, &event.UserId)
+		if err != nil {
+			return nil, err
+		}
+		events = append(events, event)
+	}
+	return events, nil
 }

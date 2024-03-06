@@ -9,12 +9,14 @@ import (
 var DB *sql.DB
 
 func InitDatabase() {
-
-	DB, err := sql.Open("sqlite3", "event_api.db")
-
+	Database, err := sql.Open("sqlite3", "api.db")
 	if err != nil {
 		panic(err)
 	}
+	DB = Database
+
 	DB.SetMaxOpenConns(15)
 	DB.SetMaxIdleConns(5)
+
+	createDatabaseTables()
 }
