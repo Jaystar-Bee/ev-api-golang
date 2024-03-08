@@ -1,0 +1,9 @@
+PUT http://localhost:8000/events/2
+Content-Type: application/json
+
+{
+    "name": "Event Test Th",
+    "description": "This is a dummy description for this event",
+    "location": "Iwo, Nigeria",
+    "date_time": "2023-04-10T13:20:54.000Z"
+}

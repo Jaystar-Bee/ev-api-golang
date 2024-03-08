@@ -2,8 +2,8 @@ POST http://localhost:8000/events
 Content-Type: application/json
 
 {
-    "name": "Event Test Two",
-    "description": "This is a dummy description for this event",
+    "name": "Event Test Ant",
+    "description": "This is a dummy description",
     "location": "Iwo, Nigeria",
     "date_time": "2023-04-10T13:20:54.000Z"
 }

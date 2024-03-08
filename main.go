@@ -9,7 +9,6 @@ import (
 func main() {
 	db.InitDatabase()
 	server := gin.Default()
-
 	routes.RegisterEventRoutes(server)
 	server.Run(":8000")
 }
