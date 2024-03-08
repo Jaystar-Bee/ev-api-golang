@@ -12,7 +12,7 @@ type Event struct {
 	Description string    `json:"description" binding:"required"`
 	Location    string    `json:"location" binding:"required"`
 	DateTime    time.Time `json:"date_time" binding:"required"`
-	CreatedAt   string    `json:"created_at"`
+	CreatedAt   time.Time `json:"created_at"`
 	UserId      int64     `json:"user_id"`
 }
 
@@ -25,8 +25,8 @@ func (e *Event) Save() error {
 	if err != nil {
 		return err
 	}
-	time := time.Now().Format(time.RFC3339)
 	defer statement.Close()
+	time := time.Now()
 	data, err := statement.Exec(e.Name, e.Description, e.Location, e.DateTime, time, e.UserId)
 	if err != nil {
 		return err
@@ -37,6 +37,27 @@ func (e *Event) Save() error {
 	}
 	e.ID = id
 	e.CreatedAt = time
+	return nil
+}
+
+func GetEvent(id int64) (*Event, error) {
+	const query = `SELECT * FROM events WHERE id = ?`
+	row := db.DB.QueryRow(query, id)
+
+	event := &Event{}
+	err := row.Scan(&event.ID, &event.Name, &event.Description, &event.Location, &event.DateTime, &event.CreatedAt, &event.UserId)
+	if err != nil {
+		return nil, err
+	}
+	return event, nil
+}
+
+func DeleteEvent(id int64) error {
+	const query = `DELETE FROM events WHERE id = ?`
+	_, err := db.DB.Exec(query, id)
+	if err != nil {
+		return err
+	}
 	return nil
 }
 
