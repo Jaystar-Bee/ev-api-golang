@@ -34,11 +34,10 @@ func RegisterUser(context *gin.Context) {
 
 	// CHECK IF USER ALREADY EXIST WITH THE EMAIL
 	userFound, _ := models.GetUserByEmail(user.Email)
-	// fmt.Println(userFound)
 	if userFound != nil {
 		context.JSON(http.StatusBadRequest, gin.H{
-			"message": "User already exists",
-			"error":   err.Error(),
+			"message": "User already exist",
+			"error":   nil,
 		})
 		return
 	}

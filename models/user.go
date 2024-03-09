@@ -1,7 +1,6 @@
 package models
 
 import (
-	"fmt"
 	"time"
 
 	"test.com/event-api/db"
@@ -30,13 +29,13 @@ func (user *User) Save() error {
 	}
 	defer statement.Close()
 
+	// HASH PASSWORD AND GET TIME
 	hashedPassword, err := utils.HashPassword(user.Password)
 	if err != nil {
 		return err
 	}
-	fmt.Println(hashedPassword)
-
 	timeCreated := time.Now()
+
 	data, err := statement.Exec(user.Email, user.FirstName, user.LastName, hashedPassword, timeCreated, timeCreated)
 	if err != nil {
 		return err
@@ -51,17 +50,13 @@ func (user *User) Save() error {
 }
 
 func GetUserByEmail(email string) (*User, error) {
-	var query = `SELECT * FROM users WHERE id = ?`
-	fmt.Println(query)
-	data := db.DB.QueryRow(query, 2)
-	fmt.Println(data)
+	var query = `SELECT * FROM users WHERE email = ?`
+	data := db.DB.QueryRow(query, email)
 	user := &User{}
 	err := data.Scan(&user.ID, &user.Email, &user.FirstName, &user.LastName, &user.Password, &user.CreatedAt, &user.UpdatedAt)
 	if err != nil {
-		fmt.Println(err)
 		return nil, err
 	}
-	fmt.Println(user)
 	return user, nil
 }
 
