@@ -10,5 +10,6 @@ func main() {
 	db.InitDatabase()
 	server := gin.Default()
 	routes.RegisterEventRoutes(server)
+	routes.RegisterUserRoutes(server)
 	server.Run(":8000")
 }

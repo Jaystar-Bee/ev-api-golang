@@ -1,6 +1,7 @@
 package models
 
 import (
+	"fmt"
 	"time"
 
 	"test.com/event-api/db"
@@ -42,6 +43,7 @@ func (e *Event) Save() error {
 
 func GetEvent(id int64) (*Event, error) {
 	const query = `SELECT * FROM events WHERE id = ?`
+	fmt.Println(query)
 	row := db.DB.QueryRow(query, id)
 
 	event := &Event{}

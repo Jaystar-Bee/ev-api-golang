@@ -2,7 +2,7 @@ package routes
 
 import (
 	"github.com/gin-gonic/gin"
-	handler "test.com/event-api/handlers/event"
+	handler "test.com/event-api/handlers"
 )
 
 func RegisterEventRoutes(server *gin.Engine) {
