@@ -8,6 +8,7 @@ import (
 	"test.com/event-api/models"
 )
 
+// REGISTER USER
 func RegisterUser(context *gin.Context) {
 
 	var user models.User
@@ -55,5 +56,36 @@ func RegisterUser(context *gin.Context) {
 		"message": "User registered successfully",
 		"user":    user,
 	})
+
+}
+
+// LOGIN USER
+
+func LoginUser(context *gin.Context) {
+	var login models.Login
+
+	err := context.ShouldBindJSON(&login)
+	if err != nil {
+		context.JSON(http.StatusBadRequest, gin.H{
+			"message": "Could not process the data",
+			"error":   err.Error(),
+		})
+		return
+	}
+
+	err = login.ValidateUserCredentials()
+	if err != nil {
+		context.JSON(http.StatusNotFound, gin.H{
+			"message": err.Error(),
+			"error":   "Cound not authenticate user",
+		})
+		return
+	}
+
+	context.JSON(http.StatusAccepted, gin.H{
+		"message": "User logged in successfully",
+	})
+
+	// Login user
 
 }

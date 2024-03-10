@@ -1,6 +1,7 @@
 package models
 
 import (
+	"errors"
 	"time"
 
 	"test.com/event-api/db"
@@ -15,6 +16,19 @@ type User struct {
 	Password  string    `json:"password" binding:"required"`
 	CreatedAt time.Time `json:"created_at"`
 	UpdatedAt time.Time `json:"updated_at"`
+}
+
+type UserResponse struct {
+	ID        int64     `json:"id"`
+	Email     string    `json:"email" binding:"required"`
+	FirstName string    `json:"first_name" binding:"required"`
+	LastName  string    `json:"last_name" binding:"required"`
+	CreatedAt time.Time `json:"created_at"`
+	UpdatedAt time.Time `json:"updated_at"`
+}
+type Login struct {
+	Email    string `json:"email" binding:"required"`
+	Password string `json:"password" binding:"required"`
 }
 
 func (user *User) Save() error {
@@ -45,19 +59,38 @@ func (user *User) Save() error {
 		return err
 	}
 	user.ID = id
+	user.Password = hashedPassword
 	user.CreatedAt = timeCreated
 	return nil
 }
 
-func GetUserByEmail(email string) (*User, error) {
+func GetUserByEmail(email string) (*UserResponse, error) {
 	var query = `SELECT * FROM users WHERE email = ?`
 	data := db.DB.QueryRow(query, email)
-	user := &User{}
-	err := data.Scan(&user.ID, &user.Email, &user.FirstName, &user.LastName, &user.Password, &user.CreatedAt, &user.UpdatedAt)
+	user := &UserResponse{}
+	err := data.Scan(&user.ID, &user.Email, &user.FirstName, &user.LastName, &user.CreatedAt, &user.UpdatedAt)
 	if err != nil {
 		return nil, err
 	}
 	return user, nil
+}
+
+func (login Login) ValidateUserCredentials() error {
+	query := `
+ SELECT password FROM users WHERE email = ?
+ `
+	row := db.DB.QueryRow(query, login.Email)
+	var password string
+	err := row.Scan(&password)
+	if err != nil {
+		return errors.New("User not found")
+	}
+	err = utils.ComparePassword(password, login.Password)
+	if err != nil {
+		return errors.New("wrong password")
+	}
+
+	return nil
 }
 
 func (u *User) Update() (*User, error) {
