@@ -6,6 +6,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"test.com/event-api/models"
+	"test.com/event-api/utils"
 )
 
 // REGISTER USER
@@ -73,7 +74,7 @@ func LoginUser(context *gin.Context) {
 		return
 	}
 
-	err = login.ValidateUserCredentials()
+	user_detail, err := login.ValidateUserCredentials()
 	if err != nil {
 		context.JSON(http.StatusNotFound, gin.H{
 			"message": err.Error(),
@@ -82,8 +83,19 @@ func LoginUser(context *gin.Context) {
 		return
 	}
 
+	token, err := utils.GenerateToken(login.Email, user_detail.ID)
+	if err != nil {
+		context.JSON(http.StatusInternalServerError, gin.H{
+			"message": "Could not generate token",
+			"error":   err.Error(),
+		})
+		return
+	}
+
 	context.JSON(http.StatusAccepted, gin.H{
 		"message": "User logged in successfully",
+		"user":    user_detail,
+		"token":   token,
 	})
 
 	// Login user

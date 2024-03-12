@@ -3,9 +3,11 @@ package handler
 import (
 	"net/http"
 	"strconv"
+	"time"
 
 	"github.com/gin-gonic/gin"
 	"test.com/event-api/models"
+	"test.com/event-api/utils"
 )
 
 // GET ALL EVENTS
@@ -93,8 +95,31 @@ func DeleteEvent(context *gin.Context) {
 // CREATE AN EVENT
 func CreateEvent(context *gin.Context) {
 
+	token := context.Request.Header.Get("Authorization")
+
+	if token == "" {
+		context.JSON(http.StatusUnauthorized, gin.H{
+			"message": "You're unauthorized",
+		})
+	}
+
+	tokenData, err := utils.VerifyToken(token)
+
+	if err != nil {
+		context.JSON(http.StatusForbidden, gin.H{
+			"message": "Not Authorized",
+		})
+	}
+	expireTime := tokenData["exp"].(int64)
+	if expireTime > time.Now().Unix() {
+		context.JSON(http.StatusForbidden, gin.H{
+			"message": "jwt token Expired",
+		})
+	}
+	userId := tokenData["userId"].(int64)
+
 	var event models.Event
-	err := context.ShouldBindJSON(&event)
+	err = context.ShouldBindJSON(&event)
 
 	if err != nil {
 		context.JSON(http.StatusBadRequest, gin.H{
@@ -104,7 +129,7 @@ func CreateEvent(context *gin.Context) {
 		return
 	}
 
-	event.UserId = 10
+	event.UserId = userId
 	err = event.Save()
 	if err != nil {
 		context.JSON(http.StatusInternalServerError, gin.H{

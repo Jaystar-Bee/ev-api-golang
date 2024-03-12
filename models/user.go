@@ -75,22 +75,31 @@ func GetUserByEmail(email string) (*UserResponse, error) {
 	return user, nil
 }
 
-func (login Login) ValidateUserCredentials() error {
+func (login Login) ValidateUserCredentials() (*UserResponse, error) {
 	query := `
- SELECT password FROM users WHERE email = ?
+ SELECT * FROM users WHERE email = ?
  `
 	row := db.DB.QueryRow(query, login.Email)
-	var password string
-	err := row.Scan(&password)
+	var user User
+	err := row.Scan(&user.ID, &user.Email, &user.FirstName, &user.LastName, &user.Password, &user.CreatedAt, &user.UpdatedAt)
 	if err != nil {
-		return errors.New("User not found")
+		return nil, errors.New("User not found")
 	}
-	err = utils.ComparePassword(password, login.Password)
-	if err != nil {
-		return errors.New("wrong password")
+	var userRes = UserResponse{
+		ID:        user.ID,
+		Email:     user.Email,
+		FirstName: user.FirstName,
+		LastName:  user.LastName,
+		CreatedAt: user.CreatedAt,
+		UpdatedAt: user.UpdatedAt,
 	}
 
-	return nil
+	err = utils.ComparePassword(user.Password, login.Password)
+	if err != nil {
+		return nil, errors.New("wrong password")
+	}
+
+	return &userRes, nil
 }
 
 func (u *User) Update() (*User, error) {
