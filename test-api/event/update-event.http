@@ -1,8 +1,9 @@
-PUT http://localhost:8000/events/2
+PUT http://localhost:8000/events/5
 Content-Type: application/json
+Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImFtamF5c3RhQGdtYWlsLmNvbSIsImV4cCI6MTcxMDcwNTY3NSwidXNlcklkIjoyfQ.NtDyoBeMUm941apEDsy5GwnWjOXwAOGoCdtkypccUIs
 
 {
-    "name": "Event Test Th",
+    "name": "Event Test Theree",
     "description": "This is a dummy description for this event",
     "location": "Iwo, Nigeria",
     "date_time": "2023-04-10T13:20:54.000Z"

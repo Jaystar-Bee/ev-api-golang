@@ -81,11 +81,11 @@ func GetAllEvents() ([]Event, error) {
 	return events, nil
 }
 
-func (event *Event) UpdateEvent() error {
+func (event *Event) UpdateEvent(fetchedEvent *Event) error {
 
 	query := `
 	Update events
-	SET name = ?, description = ?, location = ?, date_time = ?, user_id = ?
+	SET name = ?, description = ?, location = ?, date_time = ?, user_id = ?, created_at = ?
 	WHERE id = ?
 	`
 	statement, err := db.DB.Prepare(query)
@@ -94,7 +94,7 @@ func (event *Event) UpdateEvent() error {
 	}
 	defer statement.Close()
 
-	_, err = statement.Exec(event.Name, event.Description, event.Location, event.DateTime, event.UserId, event.ID)
+	_, err = statement.Exec(event.Name, event.Description, event.Location, event.DateTime, fetchedEvent.UserId, fetchedEvent.CreatedAt, event.ID)
 	if err != nil {
 		return err
 	}

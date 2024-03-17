@@ -3,11 +3,9 @@ package handler
 import (
 	"net/http"
 	"strconv"
-	"time"
 
 	"github.com/gin-gonic/gin"
 	"test.com/event-api/models"
-	"test.com/event-api/utils"
 )
 
 // GET ALL EVENTS
@@ -77,6 +75,15 @@ func DeleteEvent(context *gin.Context) {
 		return
 	}
 
+	userId := context.GetInt64("userId")
+	if eventToDelete.UserId != userId {
+		context.JSON(http.StatusForbidden, gin.H{
+			"message": "You are not authorized to delete this event",
+			"data":    nil,
+		})
+		return
+	}
+
 	err = models.DeleteEvent(parsedId)
 	if err != nil {
 		context.JSON(http.StatusNotFound, gin.H{
@@ -95,31 +102,8 @@ func DeleteEvent(context *gin.Context) {
 // CREATE AN EVENT
 func CreateEvent(context *gin.Context) {
 
-	token := context.Request.Header.Get("Authorization")
-
-	if token == "" {
-		context.JSON(http.StatusUnauthorized, gin.H{
-			"message": "You're unauthorized",
-		})
-	}
-
-	tokenData, err := utils.VerifyToken(token)
-
-	if err != nil {
-		context.JSON(http.StatusForbidden, gin.H{
-			"message": "Not Authorized",
-		})
-	}
-	expireTime := tokenData["exp"].(int64)
-	if expireTime > time.Now().Unix() {
-		context.JSON(http.StatusForbidden, gin.H{
-			"message": "jwt token Expired",
-		})
-	}
-	userId := tokenData["userId"].(int64)
-
 	var event models.Event
-	err = context.ShouldBindJSON(&event)
+	err := context.ShouldBindJSON(&event)
 
 	if err != nil {
 		context.JSON(http.StatusBadRequest, gin.H{
@@ -128,7 +112,7 @@ func CreateEvent(context *gin.Context) {
 		})
 		return
 	}
-
+	userId := context.GetInt64("userId")
 	event.UserId = userId
 	err = event.Save()
 	if err != nil {
@@ -160,12 +144,21 @@ func UpdateEventByID(context *gin.Context) {
 		return
 	}
 
-	_, err = models.GetEvent(parsedId)
+	event, err := models.GetEvent(parsedId)
 	if err != nil {
 		context.JSON(http.StatusNotFound, gin.H{
-			"message": "Could not fetch event to edit",
+			"message": "Could not find event to edit",
 			"data":    nil,
 			"error":   err.Error(),
+		})
+		return
+	}
+
+	userId := context.GetInt64("userId")
+	if event.UserId != userId {
+		context.JSON(http.StatusForbidden, gin.H{
+			"message": "You are not authorized to edit this event",
+			"data":    nil,
 		})
 		return
 	}
@@ -181,7 +174,7 @@ func UpdateEventByID(context *gin.Context) {
 		return
 	}
 	eventToUpdate.ID = parsedId
-	err = eventToUpdate.UpdateEvent()
+	err = eventToUpdate.UpdateEvent(event)
 
 	if err != nil {
 		context.JSON(http.StatusInternalServerError, gin.H{

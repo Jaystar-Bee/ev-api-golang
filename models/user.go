@@ -75,7 +75,7 @@ func GetUserByEmail(email string) (*UserResponse, error) {
 	return user, nil
 }
 
-func (login Login) ValidateUserCredentials() (*UserResponse, error) {
+func (login *Login) ValidateUserCredentials() (*UserResponse, error) {
 	query := `
  SELECT * FROM users WHERE email = ?
  `
