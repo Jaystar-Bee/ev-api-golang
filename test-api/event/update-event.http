@@ -1,6 +1,6 @@
-PUT http://localhost:8000/events/5
+PUT http://localhost:8000/events/7
 Content-Type: application/json
-Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImFtamF5c3RhQGdtYWlsLmNvbSIsImV4cCI6MTcxMDcwNTY3NSwidXNlcklkIjoyfQ.NtDyoBeMUm941apEDsy5GwnWjOXwAOGoCdtkypccUIs
+Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImFtamF5c3RhQGdtYWlsLmNvbSIsImV4cCI6MTcxMDcwNjc2NywidXNlcklkIjoyfQ.oLMo9zWl3tL_5sTzP8JcBcE6jXyZglKDNWTfkUzRjOY
 
 {
     "name": "Event Test Theree",

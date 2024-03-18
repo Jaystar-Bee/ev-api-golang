@@ -81,7 +81,7 @@ func GetAllEvents() ([]Event, error) {
 	return events, nil
 }
 
-func (event *Event) UpdateEvent(fetchedEvent *Event) error {
+func (event *Event) UpdateEvent() error {
 
 	query := `
 	Update events
@@ -94,7 +94,7 @@ func (event *Event) UpdateEvent(fetchedEvent *Event) error {
 	}
 	defer statement.Close()
 
-	_, err = statement.Exec(event.Name, event.Description, event.Location, event.DateTime, fetchedEvent.UserId, fetchedEvent.CreatedAt, event.ID)
+	_, err = statement.Exec(event.Name, event.Description, event.Location, event.DateTime, event.UserId, event.CreatedAt, event.ID)
 	if err != nil {
 		return err
 	}

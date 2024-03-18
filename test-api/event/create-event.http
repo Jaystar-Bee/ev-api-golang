@@ -1,6 +1,6 @@
 POST http://localhost:8000/events
 Content-Type: application/json
-authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImFtamF5c3RhQGdtYWlsLmNvbSIsImV4cCI6MTcxMDcwNDgwMCwidXNlcklkIjoyfQ.qFGpGXY4sI6M6jqbM9d0572yWk2JotE5H2KeIMmLR-U
+Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImFtamF5c3RhckBnbWFpbC5jb20iLCJleHAiOjE3MTA3MjM5NjIsInVzZXJJZCI6MX0.fz8XLoC58PipnJWVgNyZ_kkQqUKCjkiRaVX83f1bfAc
 
 {
     "name": "Event Test Ant",

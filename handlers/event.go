@@ -174,7 +174,9 @@ func UpdateEventByID(context *gin.Context) {
 		return
 	}
 	eventToUpdate.ID = parsedId
-	err = eventToUpdate.UpdateEvent(event)
+	eventToUpdate.UserId = event.UserId // Set the user ID to the original user ID of the event to update. This ensures that the user ID of the updated event is the same as the original user ID. Without this, the updated event would have a different user ID than the original event. This would result in a security vulnerability if the
+	eventToUpdate.CreatedAt = event.CreatedAt
+	err = eventToUpdate.UpdateEvent()
 
 	if err != nil {
 		context.JSON(http.StatusInternalServerError, gin.H{
@@ -187,5 +189,82 @@ func UpdateEventByID(context *gin.Context) {
 	context.JSON(http.StatusOK, gin.H{
 		"message": "Event updated successfully",
 		"data":    eventToUpdate,
+	})
+}
+
+// REGISTER USER FOR AN EVENT
+func RegisterForEvent(context *gin.Context) {
+	parsedEventId, err := strconv.ParseInt(context.Param("id"), 10, 64)
+	if err != nil {
+		context.JSON(http.StatusBadRequest, gin.H{
+			"message": "Could not parse event id",
+		})
+		return
+	}
+
+	event, err := models.GetEvent(parsedEventId)
+	if err != nil {
+		context.JSON(http.StatusNotFound, gin.H{
+			"message": "Could not find event",
+		})
+		return
+	}
+	userId := context.GetInt64("userId")
+	_, err = event.GetRegistrationByEvent(userId)
+	if err == nil {
+		context.JSON(http.StatusNotAcceptable, gin.H{
+			"message": "Registration already exists",
+		})
+		return
+	}
+
+	err = event.Register(userId)
+	if err != nil {
+		context.JSON(http.StatusInternalServerError, gin.H{
+			"message": "Error registering for the event!",
+		})
+		return
+	}
+	context.JSON(http.StatusCreated, gin.H{
+		"message": "Registration for " + event.Name + " was successful!",
+	})
+
+}
+
+func CancelRegistrationForEvent(context *gin.Context) {
+	parsedEventId, err := strconv.ParseInt(context.Param("id"), 10, 64)
+	if err != nil {
+		context.JSON(http.StatusBadRequest, gin.H{
+			"message": "Could not parse event id",
+		})
+		return
+	}
+	event, err := models.GetEvent(parsedEventId)
+	if err != nil {
+		context.JSON(http.StatusNotFound, gin.H{
+			"message": "Could not find event",
+		})
+		return
+	}
+
+	userId := context.GetInt64("userId")
+	_, err = event.GetRegistrationByEvent(userId)
+	if err != nil {
+		context.JSON(http.StatusNotAcceptable, gin.H{
+			"message": "You have not registered for this event",
+		})
+		return
+	}
+
+	err = event.Cancel(userId)
+	if err != nil {
+		context.JSON(http.StatusInternalServerError, gin.H{
+			"message": "Error cancelling registration for the event!",
+		})
+		return
+	}
+
+	context.JSON(http.StatusOK, gin.H{
+		"message": "Registration for " + event.Name + " was cancelled!",
 	})
 }
