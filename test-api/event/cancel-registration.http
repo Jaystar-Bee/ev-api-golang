@@ -1,2 +1,2 @@
-POST http://localhost:8000/events/3/register
+DELETE http://localhost:8000/events/3/register
 Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImFtamF5c3RhQGdtYWlsLmNvbSIsImV4cCI6MTcxMDc5MTExMiwidXNlcklkIjoyfQ.WYf0uTxGb7MMlGB11fFYqzQyLLVTFXxgRCkAlODZvAU
